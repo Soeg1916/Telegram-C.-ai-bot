@@ -1,65 +1,147 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Character Chat Bot</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f7f9fc;
+        }
+        header {
+            background-color: #3a86ff;
+            color: white;
+            text-align: center;
+            padding: 1.5rem 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h2 {
+            color: #1d3557;
+            border-bottom: 2px solid #e6f0ff;
+            padding-bottom: 0.5rem;
+        }
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .feature {
+            margin-bottom: 1.5rem;
+        }
+        .feature h3 {
+            color: #3a86ff;
+            margin-bottom: 0.5rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #3a86ff;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            background-color: #1d3557;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>About Character Chat Bot</h1>
+    </header>
 
-{% block title %}Character Chat Bot - About{% endblock %}
-
-{% block content %}
-<div class="mb-5">
-    <h1>About Character Chat Bot</h1>
-    <p class="lead">An AI-powered chatbot that lets you talk to your favorite fictional characters.</p>
-</div>
-
-<div class="row mb-5">
-    <div class="col-md-6">
-        <h3>Our Mission</h3>
-        <p>Character Chat Bot was created with a simple mission: to bring fictional characters to life through conversation. We believe that stories and characters have the power to inspire, entertain, and connect people across cultures and generations.</p>
+    <div class="container">
+        <a href="/" class="back-link">← Back to Home</a>
         
-        <p>By combining advanced AI technology with carefully crafted character personalities, we've created an experience that allows you to have meaningful conversations with characters from your favorite stories.</p>
+        <div class="section">
+            <h2>What is Character Chat Bot?</h2>
+            <p>
+                Character Chat Bot is an AI-powered Telegram bot that allows users to have immersive conversations 
+                with fictional characters from various universes. Our bot transforms AI interactions into engaging, 
+                role-playing experiences with advanced emotional expression and character consistency.
+            </p>
+            <p>
+                Whether you want to solve mysteries with Sherlock Holmes, discuss ninja techniques with Naruto, 
+                or have a heart-to-heart with your favorite character, our bot provides a unique and personalized experience.
+            </p>
+        </div>
         
-        <h3>How It Works</h3>
-        <p>Our bot uses Mistral AI, a powerful language model, to generate character responses that are consistent with their established personalities, backgrounds, and speaking styles.</p>
+        <div class="section">
+            <h2>Key Features</h2>
+            
+            <div class="feature">
+                <h3>Authentic Character Interaction</h3>
+                <p>
+                    Each character maintains their unique personality, speech patterns, and knowledge base. 
+                    They respond as if they are real people with physical forms and complete personalities.
+                </p>
+            </div>
+            
+            <div class="feature">
+                <h3>Emotional Expression</h3>
+                <p>
+                    Characters can express genuine emotions through specially formatted text. 
+                    Actions appear in strikethrough text, while emotional sounds are emphasized in bold.
+                </p>
+            </div>
+            
+            <div class="feature">
+                <h3>Custom Character Creation</h3>
+                <p>
+                    Create your own characters with unique personalities, traits, and backstories. 
+                    Share your creations with the community through our approval system.
+                </p>
+            </div>
+            
+            <div class="feature">
+                <h3>Relationship Development</h3>
+                <p>
+                    Characters remember your conversations and develop their relationship with you over time. 
+                    Their mood and feelings toward you change based on your interactions.
+                </p>
+            </div>
+            
+            <div class="feature">
+                <h3>NSFW Mode (Adults Only)</h3>
+                <p>
+                    For adult users, characters can engage in more mature and uninhibited conversations. 
+                    This feature is optional and can be toggled for each character.
+                </p>
+            </div>
+        </div>
         
-        <p>Each character has a unique set of personality traits that influence how they respond to your messages. As you chat with a character, they'll remember your previous conversations and their mood will change based on your interactions.</p>
+        <div class="section">
+            <h2>Technology</h2>
+            <p>
+                Character Chat Bot is powered by advanced AI language models from Mistral AI, 
+                combined with custom natural language processing techniques to ensure authentic character responses.
+            </p>
+            <p>
+                The bot is built with Python using the Telegram Bot API and Flask for web components. 
+                All character data and conversation histories are securely stored in a PostgreSQL database.
+            </p>
+        </div>
     </div>
-    
-    <div class="col-md-6">
-        <h3>Features</h3>
-        <ul class="list-group mb-4">
-            <li class="list-group-item">Chat with preset characters from popular fiction</li>
-            <li class="list-group-item">Create your own custom characters</li>
-            <li class="list-group-item">Characters remember your conversations</li>
-            <li class="list-group-item">Dynamic mood system that evolves based on interactions</li>
-            <li class="list-group-item">Easy access through Telegram</li>
-        </ul>
-        
-        <h3>Technology</h3>
-        <p>Character Chat Bot is built using:</p>
-        <ul class="list-group">
-            <li class="list-group-item">Python Telegram Bot library</li>
-            <li class="list-group-item">Mistral AI for character response generation</li>
-            <li class="list-group-item">Flask for the web interface</li>
-            <li class="list-group-item">PostgreSQL for data persistence</li>
-        </ul>
-    </div>
-</div>
 
-<div class="row mb-5">
-    <div class="col-12">
-        <h3>Privacy & Data</h3>
-        <p>We care about your privacy. Here's what you should know about how we handle your data:</p>
-        <ul>
-            <li>We store your Telegram ID and conversation history to provide a seamless experience.</li>
-            <li>Your conversations are private and not shared with other users.</li>
-            <li>We don't use your conversations for any purpose other than improving your experience with the bot.</li>
-            <li>You can reset your conversation history at any time using the /reset command.</li>
-        </ul>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12 text-center">
-        <h3>Start Chatting Today!</h3>
-        <p>Ready to start a conversation with your favorite character?</p>
-        <a href="https://t.me/CharacterChatBot" target="_blank" class="btn btn-primary btn-lg mt-2">Open in Telegram</a>
-    </div>
-</div>
-{% endblock %}
+    <footer>
+        <p>&copy; 2025 Character Chat Bot. All rights reserved.</p>
+    </footer>
+</body>
+</html>

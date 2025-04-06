@@ -1,281 +1,271 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - Character Chat Bot</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f7f9fc;
+        }
+        header {
+            background-color: #3a86ff;
+            color: white;
+            text-align: center;
+            padding: 1.5rem 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        aside {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+        }
+        aside ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        aside li {
+            margin-bottom: 0.5rem;
+        }
+        aside a {
+            color: #3a86ff;
+            text-decoration: none;
+        }
+        aside a:hover {
+            text-decoration: underline;
+        }
+        .content {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #1d3557;
+            border-bottom: 2px solid #e6f0ff;
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+        }
+        h3 {
+            color: #3a86ff;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        code {
+            background-color: #f0f4f8;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .command {
+            background-color: #e6f0ff;
+            padding: 1rem;
+            border-left: 4px solid #3a86ff;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #3a86ff;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e6f0ff;
+        }
+        th {
+            background-color: #f0f4f8;
+            color: #1d3557;
+        }
+        footer {
+            background-color: #1d3557;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Documentation</h1>
+        <p>Learn how to use Character Chat Bot</p>
+    </header>
 
-{% block title %}Character Chat Bot - Documentation{% endblock %}
-
-{% block content %}
-<div class="mb-5">
-    <h1>Documentation</h1>
-    <p class="lead">Learn how to use the Character Chat Bot and its features.</p>
-</div>
-
-<div class="row mb-5">
-    <div class="col-md-3 mb-4">
-        <div class="list-group" id="list-tab" role="tablist">
-            <a class="list-group-item list-group-item-action active" id="list-getting-started-list" data-bs-toggle="list" href="#list-getting-started" role="tab">Getting Started</a>
-            <a class="list-group-item list-group-item-action" id="list-commands-list" data-bs-toggle="list" href="#list-commands" role="tab">Bot Commands</a>
-            <a class="list-group-item list-group-item-action" id="list-characters-list" data-bs-toggle="list" href="#list-characters" role="tab">Character Profiles</a>
-            <a class="list-group-item list-group-item-action" id="list-custom-list" data-bs-toggle="list" href="#list-custom" role="tab">Custom Characters</a>
-            <a class="list-group-item list-group-item-action" id="list-api-list" data-bs-toggle="list" href="#list-api" role="tab">API Reference</a>
-            <a class="list-group-item list-group-item-action" id="list-faq-list" data-bs-toggle="list" href="#list-faq" role="tab">FAQ</a>
+    <div class="container">
+        <a href="/" class="back-link">← Back to Home</a>
+        
+        <div class="content">
+            <h2 id="getting-started">Getting Started</h2>
+            <p>
+                To start using Character Chat Bot, simply message our bot on Telegram at 
+                <a href="https://t.me/your_bot_username" target="_blank">@your_bot_username</a>.
+            </p>
+            
+            <h3>Basic Commands</h3>
+            <p>Here are the essential commands to get started:</p>
+            
+            <div class="command">
+                <code>/start</code> - Start the bot and get a welcome message
+            </div>
+            <div class="command">
+                <code>/help</code> - Show available commands and usage information
+            </div>
+            <div class="command">
+                <code>/characters</code> - List all available characters
+            </div>
+            <div class="command">
+                <code>/select [character_id]</code> - Select a character to chat with
+            </div>
+            
+            <h2 id="chatting">Chatting with Characters</h2>
+            <p>
+                After selecting a character using <code>/select</code>, you can start chatting right away. 
+                Simply send messages as you would in a normal conversation, and the character will respond.
+            </p>
+            
+            <h3>Character Memory</h3>
+            <p>
+                Characters remember your conversation history and will refer to past interactions. 
+                Their mood and relationship with you evolve based on your conversations.
+            </p>
+            
+            <div class="command">
+                <code>/reset</code> - Reset your conversation with the current character
+            </div>
+            <div class="command">
+                <code>/stats</code> - Show your relationship stats with the current character
+            </div>
+            
+            <h2 id="creating">Creating Custom Characters</h2>
+            <p>
+                You can create your own custom characters with unique personalities, traits, and backstories.
+            </p>
+            
+            <h3>Character Creation Process</h3>
+            <div class="command">
+                <code>/create</code> - Start the character creation process
+            </div>
+            <p>
+                The bot will guide you through the creation process, asking for:
+            </p>
+            <ol>
+                <li>Character name</li>
+                <li>Description/background</li>
+                <li>Personality traits</li>
+                <li>System prompt (how the character should act)</li>
+                <li>NSFW setting (whether the character can engage in mature content)</li>
+            </ol>
+            
+            <h3>Managing Custom Characters</h3>
+            <div class="command">
+                <code>/mycharacters</code> - List characters you've created
+            </div>
+            <div class="command">
+                <code>/delete [character_id]</code> - Delete a custom character you've created
+            </div>
+            
+            <h2 id="sharing">Sharing Characters</h2>
+            <p>
+                You can share your custom characters with the community through our approval system.
+            </p>
+            
+            <div class="command">
+                <code>/share [character_id]</code> - Request to share a custom character with the community
+            </div>
+            <div class="command">
+                <code>/publiccharacters</code> - Browse community-shared characters
+            </div>
+            
+            <h2 id="nsfw">NSFW Mode</h2>
+            <p>
+                For adult users, characters can engage in more mature and uninhibited conversations.
+            </p>
+            
+            <div class="command">
+                <code>/togglensfw</code> - Toggle NSFW mode for the current character
+            </div>
+            <p>
+                <strong>Note:</strong> NSFW content is only available for users who are 18+. 
+                Please use this feature responsibly and in accordance with Telegram's policies.
+            </p>
+            
+            <h2 id="api">API Reference</h2>
+            <p>
+                Our bot offers a simple API for developers to integrate with. Here are the available endpoints:
+            </p>
+            
+            <table>
+                <tr>
+                    <th>Endpoint</th>
+                    <th>Method</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>/api/characters</code></td>
+                    <td>GET</td>
+                    <td>Get a list of all available characters</td>
+                </tr>
+                <tr>
+                    <td><code>/api/character/{character_id}</code></td>
+                    <td>GET</td>
+                    <td>Get details for a specific character</td>
+                </tr>
+                <tr>
+                    <td><code>/api/status</code></td>
+                    <td>GET</td>
+                    <td>Check if the API is running</td>
+                </tr>
+            </table>
+            
+            <h2 id="faq">Frequently Asked Questions</h2>
+            
+            <h3>How do I change characters?</h3>
+            <p>
+                Use the <code>/select [character_id]</code> command to switch to a different character.
+                You can find character IDs with the <code>/characters</code> command.
+            </p>
+            
+            <h3>Why did my character's mood change?</h3>
+            <p>
+                Characters' moods change based on your interactions. Be kind and considerate to improve their mood,
+                or intentionally argumentative to lower it. You can check their current mood with <code>/stats</code>.
+            </p>
+            
+            <h3>Can I use this bot in group chats?</h3>
+            <p>
+                Yes, but the bot will only respond when mentioned or replied to in group chats.
+            </p>
         </div>
     </div>
-    <div class="col-md-9">
-        <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="list-getting-started" role="tabpanel">
-                <h3>Getting Started</h3>
-                <p>Welcome to Character Chat Bot! Follow these simple steps to begin chatting with your favorite characters:</p>
-                
-                <ol class="mb-4">
-                    <li>Open <a href="https://t.me/CharacterChatBot" target="_blank">Character Chat Bot</a> in Telegram.</li>
-                    <li>Send the <code>/start</code> command to initiate the bot.</li>
-                    <li>Use the <code>/characters</code> command to see a list of available characters.</li>
-                    <li>Select a character by sending <code>/character [character_id]</code>.</li>
-                    <li>Start chatting with your chosen character!</li>
-                </ol>
-                
-                <div class="alert alert-info">
-                    <strong>Tip:</strong> Use the <code>/help</code> command at any time to see a list of available commands.
-                </div>
-            </div>
-            
-            <div class="tab-pane fade" id="list-commands" role="tabpanel">
-                <h3>Bot Commands</h3>
-                <p>The Character Chat Bot offers the following commands:</p>
-                
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Command</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>/start</code></td>
-                            <td>Initialize the bot and receive a welcome message.</td>
-                        </tr>
-                        <tr>
-                            <td><code>/help</code></td>
-                            <td>Display a list of available commands and their descriptions.</td>
-                        </tr>
-                        <tr>
-                            <td><code>/characters</code></td>
-                            <td>Show a list of all available characters.</td>
-                        </tr>
-                        <tr>
-                            <td><code>/character [id]</code></td>
-                            <td>Select a character to chat with or view your current character if no ID is provided.</td>
-                        </tr>
-                        <tr>
-                            <td><code>/reset</code></td>
-                            <td>Reset your conversation with the current character.</td>
-                        </tr>
-                        <tr>
-                            <td><code>/stats</code></td>
-                            <td>Show stats for your current character, including mood and conversation count.</td>
-                        </tr>
-                        <tr>
-                            <td><code>/create</code></td>
-                            <td>Start the process of creating a custom character.</td>
-                        </tr>
-                        <tr>
-                            <td><code>/delete [id]</code></td>
-                            <td>Delete a custom character that you've created.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="tab-pane fade" id="list-characters" role="tabpanel">
-                <h3>Character Profiles</h3>
-                <p>Each character in our bot has a unique personality profile that determines how they respond to your messages.</p>
-                
-                <h5>Personality Traits</h5>
-                <p>Characters have five personality traits, each rated on a scale of 1-10:</p>
-                <ul>
-                    <li><strong>Friendliness:</strong> How warm and approachable the character is.</li>
-                    <li><strong>Humor:</strong> How likely the character is to use jokes or sarcasm.</li>
-                    <li><strong>Wisdom:</strong> How knowledgeable and insightful the character is.</li>
-                    <li><strong>Patience:</strong> How tolerant the character is of repetitive or confusing questions.</li>
-                    <li><strong>Emotional:</strong> How strongly the character expresses emotions.</li>
-                </ul>
-                
-                <h5>Mood System</h5>
-                <p>Characters have a dynamic mood system that changes based on your interactions:</p>
-                <ul>
-                    <li>All characters start with a neutral mood (5/10).</li>
-                    <li>Positive and respectful conversations improve a character's mood.</li>
-                    <li>Negative or rude messages can worsen a character's mood.</li>
-                    <li>A character's mood affects the tone and content of their responses.</li>
-                </ul>
-                
-                <h5>Memory</h5>
-                <p>Characters remember your previous conversations (up to 30 messages) and can reference them in future chats.</p>
-            </div>
-            
-            <div class="tab-pane fade" id="list-custom" role="tabpanel">
-                <h3>Custom Characters</h3>
-                <p>Want to chat with a character that's not on our list? You can create your own custom character!</p>
-                
-                <h5>Creating a Custom Character</h5>
-                <ol>
-                    <li>Send the <code>/create</code> command to start the character creation process.</li>
-                    <li>Follow the prompts to provide:
-                        <ul>
-                            <li>A name for your character</li>
-                            <li>A brief description</li>
-                            <li>Personality trait values</li>
-                            <li>A system prompt (optional, for advanced users)</li>
-                        </ul>
-                    </li>
-                    <li>Once completed, your character will be added to your personal character list.</li>
-                </ol>
-                
-                <h5>Managing Custom Characters</h5>
-                <ul>
-                    <li>Use <code>/characters</code> to see your custom characters along with preset characters.</li>
-                    <li>Custom characters are private and only visible to you.</li>
-                    <li>Use <code>/delete [id]</code> to remove a custom character you've created.</li>
-                </ul>
-                
-                <div class="alert alert-warning">
-                    <strong>Note:</strong> Custom characters must adhere to our content guidelines. Characters that promote harmful content are not allowed.
-                </div>
-            </div>
-            
-            <div class="tab-pane fade" id="list-api" role="tabpanel">
-                <h3>API Reference</h3>
-                <p>Character Chat Bot provides a simple REST API for accessing character data:</p>
-                
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">GET /api/characters</h5>
-                    </div>
-                    <div class="card-body">
-                        <p>Returns a list of all preset characters.</p>
-                        <h6>Response Format:</h6>
-                        <pre><code>{
-  "characters": {
-    "character_id": {
-      "name": "Character Name",
-      "description": "Character description",
-      "traits": {
-        "friendliness": 7,
-        "humor": 5,
-        "wisdom": 8,
-        "patience": 6,
-        "emotional": 4
-      }
-    },
-    // More characters...
-  }
-}</code></pre>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">GET /api/character/{character_id}</h5>
-                    </div>
-                    <div class="card-body">
-                        <p>Returns details for a specific character.</p>
-                        <h6>Path Parameters:</h6>
-                        <ul>
-                            <li><code>character_id</code> - The ID of the character to retrieve</li>
-                        </ul>
-                        <h6>Response Format:</h6>
-                        <pre><code>{
-  "name": "Character Name",
-  "description": "Character description",
-  "traits": {
-    "friendliness": 7,
-    "humor": 5,
-    "wisdom": 8,
-    "patience": 6,
-    "emotional": 4
-  },
-  "background": "Character background information",
-  "sample_phrases": [
-    "Hello there!",
-    "How are you today?",
-    "Tell me more about yourself."
-  ]
-}</code></pre>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="tab-pane fade" id="list-faq" role="tabpanel">
-                <h3>Frequently Asked Questions</h3>
-                
-                <div class="accordion" id="faqAccordion">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                How do I switch characters?
-                            </button>
-                        </h2>
-                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">
-                                Use the <code>/character [character_id]</code> command to switch to a different character. You can see a list of available characters with the <code>/characters</code> command.
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                How do I reset a conversation?
-                            </button>
-                        </h2>
-                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">
-                                Send the <code>/reset</code> command to clear your conversation history with the current character. This will reset the conversation but maintain the character's personality.
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                Can I suggest a new character?
-                            </button>
-                        </h2>
-                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">
-                                Yes! We're always looking to expand our character roster. Send your suggestions to us at characters@characterchatbot.com. Include the character's name, the work they're from, and a brief description.
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                                How much does the Character Chat Bot cost?
-                            </button>
-                        </h2>
-                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">
-                                Character Chat Bot is currently free to use. We may introduce premium features in the future, but the core functionality will remain free.
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
-                                Why isn't the character responding the way I expect?
-                            </button>
-                        </h2>
-                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">
-                                Character responses are generated using AI, which can sometimes be unpredictable. The responses are influenced by the character's personality traits, mood, and conversation history. If a character consistently responds in ways that seem out of character, please let us know.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+
+    <footer>
+        <p>&copy; 2025 Character Chat Bot. All rights reserved.</p>
+    </footer>
+</body>
+</html>
