@@ -37,25 +37,42 @@ async def list_characters(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     # Create inline keyboard for character selection
     keyboard = []
     
-    # Add preset characters
+    # Add preset characters header
     keyboard.append([InlineKeyboardButton("--- Preset Characters ---", callback_data="preset_header")])
+    
+    # Collect preset character buttons
+    preset_buttons = []
     for char_id, char in all_characters.items():
         if not char_id.startswith("custom_"):
             nsfw_mode = char.get("nsfw", False)
             button_text = f"{char['name']} {'🔞' if nsfw_mode else ''}"
-            keyboard.append([InlineKeyboardButton(button_text, callback_data=f"select_character:{char_id}")])
+            preset_buttons.append(
+                InlineKeyboardButton(button_text, callback_data=f"select_character:{char_id}")
+            )
+    
+    # Arrange preset character buttons in rows of 3
+    for i in range(0, len(preset_buttons), 3):
+        row = preset_buttons[i:i+3]  # Take 3 buttons at a time
+        keyboard.append(row)
     
     # Add custom characters
     if user_custom_characters:
         keyboard.append([InlineKeyboardButton("--- Your Custom Characters ---", callback_data="custom_header")])
+        
+        # Collect custom character buttons
+        custom_buttons = []
         for char_id in user_custom_characters:
             if char_id in all_characters:
                 nsfw_mode = all_characters[char_id].get("nsfw", False)
                 button_text = f"{all_characters[char_id]['name']} {'🔞' if nsfw_mode else ''}"
-                keyboard.append([InlineKeyboardButton(
-                    button_text, 
-                    callback_data=f"select_character:{char_id}"
-                )])
+                custom_buttons.append(
+                    InlineKeyboardButton(button_text, callback_data=f"select_character:{char_id}")
+                )
+        
+        # Arrange custom character buttons in rows of 3
+        for i in range(0, len(custom_buttons), 3):
+            row = custom_buttons[i:i+3]  # Take 3 buttons at a time
+            keyboard.append(row)
     
     # Add button to create a new character
     keyboard.append([InlineKeyboardButton("Create New Character", callback_data="create_character")])

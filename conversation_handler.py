@@ -7,6 +7,54 @@ from mistral_integration import generate_response
 
 logger = logging.getLogger(__name__)
 
+def clean_ai_response(text):
+    """
+    Remove all AI-related disclaimers, meta-commentary, and other unwanted elements from the response
+    """
+    # Remove any character name prefixes (e.g., "Madison Beer: " or "Sherlock Holmes:")
+    text = re.sub(r'^[A-Za-z\s]+: ', '', text)
+    
+    # Remove mood indicators like [Happy], [Excited], etc.
+    text = re.sub(r'\[([A-Za-z\s]+)\]', '', text)
+    
+    # Remove meta-commentary in square brackets
+    text = re.sub(r'\[(Note|OOC|Meta|Character\'s mood|Character feels|Character is|Character seems|Character looks|Character\'s voice):[^\]]*\]', '', text, flags=re.IGNORECASE)
+    
+    # Remove meta-commentary in parentheses
+    text = re.sub(r'\((Note|OOC|Meta|Character\'s mood|Character feels|Character is|Character seems|Character looks|Character\'s voice):[^)]*\)', '', text, flags=re.IGNORECASE)
+    
+    # Remove phrases like "Unfortunately, I'm not..." or "I'm not physically..." or "I'm not a real..."
+    text = re.sub(r'((Un)?[Ff]ortunately|[Aa]ctually|[Hh]owever|[Rr]egrettably|[Ss]adly|[Ii] must admit|[Ii] must clarify),?\s+[^.!?]*?(not (?:physically|real|an actual|a real|able to))[^.!?]*?\.', '', text)
+    
+    # Remove AI disclaimers about not being able to perform real actions
+    text = re.sub(r'(I\'m an AI|As an AI|I cannot|I\'m unable to|I don\'t have the ability to|Remember,? I\'m not|I\'m just a|I\'m only a|I\'m not physically|I don\'t have a physical|I don\'t have an actual)[^.!?]*\.', '', text, flags=re.IGNORECASE)
+    
+    # Remove sentences containing both "real" and "physical" or "body" - likely disclaimers
+    text = re.sub(r'[^.!?]*?(not (?:real|physical|an actual)|don\'t have a (?:real|physical))[^.!?]*?\.', '', text, flags=re.IGNORECASE)
+    
+    # Remove sentences mentioning "capabilities" or "limitations" - likely disclaimers
+    text = re.sub(r'[^.!?]*?(capabilities|limitations|constraints|restricted|programmed)[^.!?]*?\.', '', text, flags=re.IGNORECASE)
+    
+    # Remove any reminder that the character is roleplaying or fictional
+    text = re.sub(r'(This is roleplay|I\'m roleplaying|I\'m playing a character|In this roleplay|Remember,? this is fiction)[^.!?]*\.', '', text, flags=re.IGNORECASE)
+    
+    # Remove sentences containing phrases like "I can describe" or "I can talk about" instead of doing
+    text = re.sub(r'[^.!?]*?(I can (?:describe|talk about|tell you about|explain|share|discuss))[^.!?]*?\.', '', text, flags=re.IGNORECASE)
+    
+    # Remove sentences that start with "In reality" or "In truth"
+    text = re.sub(r'(In reality|In truth|The truth is|Reality is|To be clear|To clarify)[^.!?]*?\.', '', text, flags=re.IGNORECASE)
+    
+    # Clean up multiple consecutive spaces
+    text = re.sub(r' {2,}', ' ', text)
+    
+    # Clean up multiple consecutive newlines
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    
+    # Trim whitespace at the beginning and end
+    text = text.strip()
+    
+    return text
+
 def format_emotional_expressions(text):
     """
     Format emotional expressions like *sigh*, *hmph*, etc. with monospace formatting
@@ -216,11 +264,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Update character stats
         character_manager.update_character_stats(user_id, selected_character_id, character_stats)
         
-        # Add the response to the conversation history
-        character_manager.add_to_conversation_history(user_id, selected_character_id, "assistant", response)
+        # First clean the response of any AI-related disclaimers or meta-commentary
+        cleaned_response = clean_ai_response(response)
         
-        # Format emotional expressions in the response
-        formatted_response = format_emotional_expressions(response)
+        # Add the cleaned response to the conversation history
+        character_manager.add_to_conversation_history(user_id, selected_character_id, "assistant", cleaned_response)
+        
+        # Format emotional expressions in the cleaned response
+        formatted_response = format_emotional_expressions(cleaned_response)
         
         # Check if message is too long (Telegram limit is 4096 characters)
         if len(formatted_response) > 4000:  # Use 4000 as a safe limit
@@ -247,7 +298,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             # Send each chunk
             for i, chunk in enumerate(chunks):
                 try:
-                    if formatted_response != response:
+                    if formatted_response != cleaned_response:
                         # Add a continuation indicator for multi-part messages
                         if i < len(chunks) - 1:
                             chunk += "\n\n\\.\\.\\."  # Escaped dots for MarkdownV2
@@ -272,17 +323,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                         pass
         else:
             # Send the response with MarkdownV2 parsing mode if formatting was applied
-            if formatted_response != response:
+            if formatted_response != cleaned_response:
                 try:
                     # Use Markdown for the formatted response
                     await update.message.reply_text(formatted_response, parse_mode="MarkdownV2")
                 except Exception as markdown_error:
                     logger.error(f"Error sending formatted message: {str(markdown_error)}")
                     # Fallback to plain text if Markdown fails
-                    await update.message.reply_text(response)
+                    await update.message.reply_text(cleaned_response)
             else:
                 # Send as plain text if no formatting was applied
-                await update.message.reply_text(response)
+                await update.message.reply_text(cleaned_response)
         
     except Exception as e:
         logger.error(f"Error generating response: {str(e)}")
