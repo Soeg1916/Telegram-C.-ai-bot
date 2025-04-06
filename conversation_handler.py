@@ -300,6 +300,35 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # First clean the response of any AI-related disclaimers or meta-commentary
         cleaned_response = clean_ai_response(response)
         
+        # Additional formatting for emotion tags that aren't properly formatted with asterisks
+        emotion_tags = [
+            # Basic emotions
+            'amused', 'confused', 'surprised', 'serious', 'awkward', 'laughs', 'grins', 'smiles', 'sighs', 'smirks',
+            'angry', 'sad', 'happy', 'excited', 'nervous', 'scared', 'frustrated', 'annoyed', 'worried', 'proud',
+            'shocked', 'terrified', 'disgusted', 'jealous', 'hopeful', 'content', 'calm', 'relaxed', 'shy', 'embarrassed',
+            # Actions
+            'nods', 'shrugs', 'tilts head', 'raises eyebrow', 'crosses arms', 'rolls eyes', 'winks', 'yawns',
+            'blushes', 'smiles warmly', 'grins widely', 'giggles', 'chuckles', 'scoffs', 'grimaces',
+            # Compound emotions
+            'blushes slightly', 'slightly confused', 'a bit nervous', 'somewhat hesitant',
+            'genuinely surprised', 'visibly upset', 'clearly excited', 'completely shocked',
+            # States
+            'off', 'impressed', 'uncertain', 'determined', 'unamused', 'thinking', 'distracted', 'focused'
+        ]
+        
+        # First handle standalone emotion words with word boundaries
+        for tag in emotion_tags:
+            # Different patterns based on whether the tag is a single word or phrase
+            if ' ' not in tag:
+                # Single word - use word boundaries
+                cleaned_response = re.sub(r'(?<!\*)\b' + re.escape(tag) + r'\b(?!\*)', f'*{tag}*', cleaned_response, flags=re.IGNORECASE)
+            else:
+                # Multi-word phrase - match exactly
+                cleaned_response = re.sub(r'(?<!\*)' + re.escape(tag) + r'(?!\*)', f'*{tag}*', cleaned_response, flags=re.IGNORECASE)
+        
+        # Special handling for emotion markers at the start of a line followed by text
+        cleaned_response = re.sub(r'^(\w+)\s+', r'*\1* ', cleaned_response, flags=re.MULTILINE|re.IGNORECASE)
+        
         # Add the cleaned response to the conversation history
         character_manager.add_to_conversation_history(user_id, selected_character_id, "assistant", cleaned_response)
         
