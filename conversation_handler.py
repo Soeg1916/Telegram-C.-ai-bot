@@ -287,11 +287,48 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Check if message is a single word or expression
         "is_single_word": user_message_length == 1,
         # Check for all caps (excitement/emphasis)
-        "is_excited": user_message.isupper() and len(user_message) > 3
+        "is_excited": user_message.isupper() and len(user_message) > 3,
+        # Check if message contains sexually explicit content
+        "is_sexual": any(term in user_message.lower() for term in ["fuck", "sex", "naked", "horny", "pussy", "dick", "cock", "ass"])
     }
     
     # Add message style to character stats for this interaction
     character_stats["message_style"] = message_style
+    
+    # Check for repetitiveness in the last few messages to avoid it
+    if len(conversation_history) >= 2:
+        # Get the past two assistant responses
+        past_assistant_responses = [msg["content"] for msg in conversation_history[-4:] if msg["role"] == "assistant"]
+        if len(past_assistant_responses) >= 2:
+            # Extract patterns from past responses
+            emoji_patterns = []
+            response_structures = []
+            
+            for past_response in past_assistant_responses:
+                # Extract emojis
+                emojis = re.findall(r'[\U0001F300-\U0001F6FF\U0001F700-\U0001F77F\U0001F780-\U0001F7FF\U0001F800-\U0001F8FF\U0001F900-\U0001F9FF\U0001FA00-\U0001FA6F\U0001FA70-\U0001FAFF\U00002702-\U000027B0\U000024C2-\U0001F251]+', past_response)
+                if emojis:
+                    emoji_patterns.append("".join(emojis))
+                
+                # Extract sentence structures
+                structures = []
+                sentences = re.split(r'[.!?]+', past_response)
+                for sentence in sentences:
+                    if len(sentence.strip()) > 10:  # Only consider non-trivial sentences
+                        # Create a structural fingerprint of the sentence 
+                        # (remove specific words but keep structure markers like "Oh," and "Let's")
+                        structure = re.sub(r'\b\w+\b', 'X', sentence)
+                        structure = re.sub(r'X\s+X\s+X', 'XXX', structure)  # Simplify sequences of words
+                        structures.append(structure)
+                
+                if structures:
+                    response_structures.append(structures)
+            
+            # Add these patterns to character stats for the LLM to avoid repeating
+            character_stats["avoid_patterns"] = {
+                "emoji_patterns": emoji_patterns,
+                "response_structures": response_structures
+            }
     
     # Generate a response from the character using Mistral AI
     try:

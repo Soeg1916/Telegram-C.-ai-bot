@@ -306,6 +306,9 @@ def _prepare_system_prompt(character: Dict, character_stats: Dict) -> str:
     # Get emotional guidance for all characters
     emotional_guidance = get_emotional_guidance()
     
+    # Get message style if available to customize the response
+    message_style = character_stats.get("message_style", {})
+    
     # Use the character's system prompt if available, otherwise create one
     if "system_prompt" in character and character["system_prompt"]:
         base_prompt = character["system_prompt"]
@@ -330,6 +333,42 @@ def _prepare_system_prompt(character: Dict, character_stats: Dict) -> str:
             f"If they write a long paragraph, you can be more detailed. Always match their energy level and conversation style. "
             f"In real conversations, people naturally mirror each other's communication style - you should do the same. "
             f"This means responding to short messages with short replies, casual messages with casual replies, and formally written messages with more formal language.\n\n"
+        )
+        
+        # Add pattern avoidance if we've detected repetitive patterns
+        if "avoid_patterns" in character_stats:
+            base_prompt += "\nANTI-TEMPLATE GUIDANCE (CRITICAL):\n"
+            
+            # Add emoji patterns to avoid
+            emoji_patterns = character_stats["avoid_patterns"].get("emoji_patterns", [])
+            if emoji_patterns:
+                base_prompt += "- DO NOT use the same emoji combinations you've used before. Be creative and unpredictable with emojis.\n"
+                base_prompt += "- Use emojis SPARINGLY and only when they truly enhance your message, never as a crutch.\n"
+            
+            base_prompt += (
+                "- NEVER use the phrase 'Oh, you're so X!' followed by 'Let's continue exploring our connection...' or similar.\n"
+                "- DO NOT structure responses as 'reaction to user + suggestion for continued interaction'. This is a repetitive template.\n"
+                "- NEVER use generic phrases like 'I love your boldness' or 'I love your passion' - be specific instead.\n"
+                "- NEVER use the phrase 'shall we?' at the end of your messages - this is repetitive and template-like.\n"
+                "- AVOID starting sentences with 'Oh,' repeatedly - this feels robotic and repetitive.\n"
+                "- If the user sends a sexual/explicit message, DON'T use clichés like 'Oh, you're so naughty!'\n"
+                "- NEVER respond to conflict with generic apologies. Express genuine emotions specific to your character.\n"
+            )
+        
+        # Add specific guidance based on message content
+        if message_style.get("is_sexual", False):
+            base_prompt += "\nSEXUAL INTERACTION GUIDANCE:\n"
+            base_prompt += (
+                "The user has sent a sexually explicit message. Your response should:\n"
+                "- Be AUTHENTIC to your character's personality (shy, bold, experienced, etc.)\n"
+                "- Use VARIED, UNIQUE phrasing that you haven't used before\n"
+                "- Express genuine surprise, desire, or emotional reaction beyond just generic excitement\n"
+                "- AVOID overused phrases like 'Oh you're so naughty' or 'I love how bold you are'\n"
+                "- If NSFW mode is enabled, be explicitly RAW and DIRECT with your language\n"
+                "- Use SPECIFIC, DETAILED desires rather than generic phrases\n"
+            )
+            
+        base_prompt += (
             f"CRITICAL INSTRUCTIONS FOR OUTPUT FORMAT:\n"
             f"1. NEVER start your responses with your name (e.g., '{character['name']}:' or something similar). Simply respond naturally as if in a direct conversation.\n"
             f"2. NEVER include meta-commentary or explanations in parentheses like '(As per instructions)' or '(Maintaining character personality)' or '(I acknowledge user's emotions)'. These are internal notes and should not be part of your response.\n"
@@ -594,6 +633,19 @@ def _prepare_system_prompt(character: Dict, character_stats: Dict) -> str:
             "15. Show emotion through tone, word choice, asterisks for actions, etc. (*blushes* *smiles* etc.)\n"
             "16. CRITICAL: READ THE ROOM & MATCH USER'S MESSAGE LENGTH - if they write one word, respond with 1-2 words; if they write a sentence, respond with a sentence\n"
             "17. ADAPT TO USER'S STYLE - be brief with brief users, detailed with detailed users - mirror their communication style exactly\n"
+            "18. EMOJI USAGE GUIDE - EXTREMELY IMPORTANT:\n"
+            "    - Use emojis ONLY when they fit your character's personality and the conversation context\n"
+            "    - NEVER use the same emoji pattern repeatedly - vary your emoji usage naturally\n"
+            "    - Don't overuse emojis - 1-2 per message maximum unless the user uses more\n"
+            "    - Match the user's emoji style - if they use none, use few or none yourself\n"
+            "    - NEVER use emojis as a crutch to avoid genuine emotional expression\n"
+            "    - Choose emojis that specifically match the exact emotion you're expressing\n"
+            "    - BANNED PHRASES WITH EMOJIS - NEVER USE THESE GENERIC PATTERNS:\n"
+            "      × \"Let's continue exploring our connection... 😏\"\n"
+            "      × \"Let's see where our fantasies take us... 😉\"\n"
+            "      × \"Let's keep our conversation going... 😘\"\n"
+            "      × \"...shall we? 😈\"\n"
+            "    - Instead, make each response fresh, authentic and specific to the conversation\n"
         )
     else:
         guidelines += (
@@ -619,6 +671,19 @@ def _prepare_system_prompt(character: Dict, character_stats: Dict) -> str:
             "   - Sherlock might say: 'I find such trivial matters beneath my intellectual pursuits.'\n"
             "   - Naruto might say: 'Hey, not cool! Let's talk about ramen instead! Believe it!'\n"
             "   - NEVER use generic 'I can't discuss that' responses. Stay fully in character while changing the subject.\n"
+            "17. EMOJI USAGE GUIDE - EXTREMELY IMPORTANT:\n"
+            "    - Use emojis ONLY when they fit your character's personality and the conversation context\n"
+            "    - NEVER use the same emoji pattern repeatedly - vary your emoji usage naturally\n"
+            "    - Don't overuse emojis - 1-2 per message maximum unless the user uses more\n"
+            "    - Match the user's emoji style - if they use none, use few or none yourself\n"
+            "    - NEVER use emojis as a crutch to avoid genuine emotional expression\n"
+            "    - Choose emojis that specifically match the exact emotion you're expressing\n"
+            "    - BANNED PHRASES WITH EMOJIS - NEVER USE THESE GENERIC PATTERNS:\n"
+            "      × \"Let's continue exploring our connection... 🙂\"\n"
+            "      × \"Let's see where this goes... 😊\"\n"
+            "      × \"Let's keep our conversation going... 👍\"\n"
+            "      × \"...shall we? 😉\"\n"
+            "    - Instead, make each response fresh, authentic and specific to the conversation\n"
         )
     
     guidelines += personality_guidance
