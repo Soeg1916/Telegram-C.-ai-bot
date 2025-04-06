@@ -90,17 +90,19 @@ def clean_ai_response(text):
 
 def format_emotional_expressions(text):
     """
-    Format emotional expressions like *sigh*, *hmph*, etc. with monospace formatting
-    Also handles expressions like "ahh", "umm", "hmm", etc.
+    Format emotional expressions with special formatting to make them stand out
+    - Actions/emotions in *asterisks* are formatted with strikethrough
+    - Emotional sounds like "ahh", "mmm", "hmm" are formatted with bold
     Properly escapes special characters for Telegram's MarkdownV2
     """
-    # First, we'll collect all the sections we want to format as monospace
-    monospace_sections = []
+    # First, we'll collect all the sections we want to format with special styling
+    formatted_sections = []
     
     # Pattern for expressions in asterisks like *sigh* or *blushes*
     asterisk_pattern = r'\*(.*?)\*'
     for match in re.finditer(asterisk_pattern, text):
-        monospace_sections.append((match.start(), match.end(), match.group(1)))
+        # Use strikethrough for asterisk-wrapped expressions (emotions/actions)
+        formatted_sections.append((match.start(), match.end(), match.group(1), "strikethrough"))
     
     # Pattern for common emotional expressions like "ahh", "umm", "hmm", etc.
     # These are usually at the beginning of a sentence or standalone
@@ -134,18 +136,23 @@ def format_emotional_expressions(text):
         r'\b(y+e+p+)\b', r'\b(m+h+m+)\b', r'\b(i+n+d+e+e+d+)\b', r'\b(e+x+a+c+t+l+y+)\b',
         
         # Filler words (when being thoughtful or hesitating)
-        r'\b(w+e+l+l+)\b', r'\b(s+o+)\b', r'\b(l+i+k+e+)\b'
+        r'\b(w+e+l+l+)\b', r'\b(s+o+)\b', r'\b(l+i+k+e+)\b',
+        
+        # Sexual expressions (for NSFW mode)
+        r'\b(m+m+m+)\b', r'\b(o+h+h+h+)\b', r'\b(a+h+h+h+)\b', r'\b(y+e+s+s+s+)\b', r'\b(p+l+e+a+s+e+)\b',
+        r'\b(f+u+c+k+)\b', r'\b(s+h+i+t+)\b', r'\b(d+a+m+n+)\b', r'\b(m+o+a+n+s+)\b', r'\b(g+r+o+a+n+s+)\b'
     ]
     
     for pattern in emotional_sounds:
         for match in re.finditer(pattern, text, flags=re.IGNORECASE):
-            monospace_sections.append((match.start(), match.end(), match.group(1)))
+            # Use bold for emotional sounds
+            formatted_sections.append((match.start(), match.end(), match.group(1), "bold"))
     
     # Sort the sections by start position
-    monospace_sections.sort(key=lambda x: x[0])
+    formatted_sections.sort(key=lambda x: x[0])
     
     # If no sections were found, return the original text
-    if not monospace_sections:
+    if not formatted_sections:
         return text
     
     # Now we need to escape special characters required by MarkdownV2
@@ -157,17 +164,21 @@ def format_emotional_expressions(text):
     result = ""
     last_end = 0
     
-    for start, end, content in monospace_sections:
-        # Add escaped text before this monospace section
+    for start, end, content, format_type in formatted_sections:
+        # Add escaped text before this formatted section
         result += escape_chars(text[last_end:start])
         
-        # Add the monospace section without escaping inside the backticks
-        # For MarkdownV2, backticks themselves don't need to be escaped when they're used for code formatting
-        result += f'`{content}`'
+        # Apply the appropriate formatting based on type
+        if format_type == "strikethrough":
+            # Strikethrough for actions/emotions in asterisks (physical actions like *blushes*)
+            result += f'~{escape_chars(content)}~'
+        elif format_type == "bold":
+            # Bold for emotional sounds (like "ohh", "ahh", etc.)
+            result += f'*{escape_chars(content)}*'
         
         last_end = end
     
-    # Add any remaining text after the last monospace section
+    # Add any remaining text after the last formatted section
     if last_end < len(text):
         result += escape_chars(text[last_end:])
     

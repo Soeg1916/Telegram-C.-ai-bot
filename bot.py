@@ -102,6 +102,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send help message when the command /help is issued."""
+    # Basic help text for all users
     help_text = (
         "🤖 *Character Chat Bot Help* 🤖\n\n"
         "*Available Commands:*\n"
@@ -132,6 +133,18 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "Use /nsfw to toggle NSFW mode for your current character.\n"
         "NSFW mode allows more mature and adult-themed conversations."
     )
+    
+    # Check if the user is an admin (admin ID: 1159603709)
+    user_id = update.effective_user.id
+    if user_id == 1159603709:
+        # Add admin-specific commands to the help text
+        admin_text = (
+            "\n*Admin Commands:*\n"
+            "/pending - List all characters pending approval\n"
+            "/approve <character_id> - Approve a character for public sharing\n"
+            "/reject <character_id> - Reject a character for public sharing\n"
+        )
+        help_text += admin_text
     
     keyboard = [
         [InlineKeyboardButton("Choose a Character", callback_data="show_characters")],
