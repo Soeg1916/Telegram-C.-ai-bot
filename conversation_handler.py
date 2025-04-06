@@ -24,12 +24,36 @@ def format_emotional_expressions(text):
     # Pattern for common emotional expressions like "ahh", "umm", "hmm", etc.
     # These are usually at the beginning of a sentence or standalone
     emotional_sounds = [
-        r'\b(a+h+)\b', r'\b(u+m+)\b', r'\b(h+m+)\b', r'\b(o+h+)\b', 
-        r'\b(w+o+w+)\b', r'\b(h+u+h+)\b', r'\b(e+h+)\b', r'\b(u+h+)\b',
-        r'\b(h+a+h+a+)\b', r'\b(h+e+h+e+)\b', r'\b(t+s+k+)\b', r'\b(s+i+g+h+)\b',
-        r'\b(a+w+w+)\b', r'\b(o+o+p+s+)\b', r'\b(y+a+y+)\b', r'\b(w+h+e+w+)\b',
-        r'\b(p+f+f+t+)\b', r'\b(e+e+k+)\b', r'\b(a+c+k+)\b', r'\b(h+m+p+h+)\b',
-        r'\b(e+r+m+)\b', r'\b(w+e+l+l+)\b'
+        # Hesitation and thoughtfulness
+        r'\b(a+h+)\b', r'\b(u+m+)\b', r'\b(h+m+)\b', r'\b(e+r+m+)\b', r'\b(u+h+)\b', r'\b(e+h+)\b',
+        
+        # Surprise and realization
+        r'\b(o+h+)\b', r'\b(w+o+w+)\b', r'\b(w+h+o+a+)\b', r'\b(o+m+g+)\b', r'\b(g+a+s+p+)\b',
+        
+        # Confusion
+        r'\b(h+u+h+)\b', r'\b(w+h+a+t+)\b', r'\b(e+h+)\b', r'\b(w+a+i+t+)\b',
+        
+        # Laughter and amusement
+        r'\b(h+a+h+a+)\b', r'\b(h+e+h+e+)\b', r'\b(l+o+l+)\b', r'\b(l+m+a+o+)\b', r'\b(r+o+f+l+)\b',
+        r'\b(t+e+h+e+)\b', r'\b(g+i+g+g+l+e+)\b', r'\b(c+h+u+c+k+l+e+)\b',
+        
+        # Disappointment, annoyance and frustration
+        r'\b(t+s+k+)\b', r'\b(s+i+g+h+)\b', r'\b(h+m+p+h+)\b', r'\b(a+r+g+h+)\b', r'\b(u+g+h+)\b',
+        
+        # Affection and excitement
+        r'\b(a+w+w+)\b', r'\b(c+u+t+e+)\b', r'\b(a+d+o+r+a+b+l+e+)\b', r'\b(y+a+y+)\b', r'\b(w+h+e+w+)\b',
+        
+        # Embarrassment and surprise
+        r'\b(o+o+p+s+)\b', r'\b(e+e+k+)\b', r'\b(a+c+k+)\b', r'\b(o+h+n+o+)\b',
+        
+        # Dismissal or disbelief
+        r'\b(p+f+f+t+)\b', r'\b(n+a+h+)\b', r'\b(p+s+h+)\b', r'\b(y+e+a+h+r+i+g+h+t+)\b',
+        
+        # Agreement and confirmation
+        r'\b(y+e+p+)\b', r'\b(m+h+m+)\b', r'\b(i+n+d+e+e+d+)\b', r'\b(e+x+a+c+t+l+y+)\b',
+        
+        # Filler words (when being thoughtful or hesitating)
+        r'\b(w+e+l+l+)\b', r'\b(s+o+)\b', r'\b(l+i+k+e+)\b'
     ]
     
     for pattern in emotional_sounds:
@@ -72,6 +96,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     """Handle normal messages and generate a response from the character"""
     user_message = update.message.text
     user_id = update.effective_user.id
+    chat_type = update.message.chat.type
     
     # Check if user is in character creation mode
     # If the user is in the character creation process, don't process this message
@@ -80,6 +105,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         logger.info(f"User {user_id} is in character creation mode, ignoring message in general handler")
         # Don't respond with character since the user is in creation mode
         return
+    
+    # For group chats, we need to handle mentions and replies
+    if chat_type in ["group", "supergroup"]:
+        # Check if this is a reply to the bot's message
+        if update.message.reply_to_message and update.message.reply_to_message.from_user.id == context.bot.id:
+            # This is a reply to the bot, so we'll process it
+            logger.info(f"User {user_id} replied to the bot in a group chat")
+            pass  # Continue processing
+        # Check if the bot is mentioned
+        elif f"@{context.bot.username}" in user_message:
+            # Remove the mention from the message
+            user_message = user_message.replace(f"@{context.bot.username}", "").strip()
+            logger.info(f"User {user_id} mentioned the bot in a group chat")
+            pass  # Continue processing
+        else:
+            # Not a reply to the bot and bot not mentioned, so ignore this message in group chat
+            logger.info(f"Ignoring message in group chat that's not directed at the bot")
+            return
     
     # Get the character manager
     character_manager = CharacterManager()
@@ -134,6 +177,29 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     
     # Update conversation count
     character_stats["conversation_count"] += 1
+    
+    # Analyze user message length and style to adapt response
+    user_message_length = len(user_message.split())
+    
+    # Create message_style dictionary with info about user's messaging style
+    message_style = {
+        "length": user_message_length,
+        "brief": user_message_length <= 5,  # Short messages of 5 words or less
+        "concise": 5 < user_message_length <= 15,  # Normal conversational messages
+        "detailed": 15 < user_message_length <= 30,  # More detailed messages
+        "verbose": user_message_length > 30,  # Very long messages
+        # Check if message has questions
+        "has_question": "?" in user_message,
+        # Check if message is a greeting or simple response
+        "is_greeting": any(greeting in user_message.lower() for greeting in ["hi", "hello", "hey", "sup", "yo", "what's up", "howdy"]),
+        # Check if message is a single word or expression
+        "is_single_word": user_message_length == 1,
+        # Check for all caps (excitement/emphasis)
+        "is_excited": user_message.isupper() and len(user_message) > 3
+    }
+    
+    # Add message style to character stats for this interaction
+    character_stats["message_style"] = message_style
     
     # Generate a response from the character using Mistral AI
     try:

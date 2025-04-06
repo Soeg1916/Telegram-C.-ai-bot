@@ -7,9 +7,17 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Set up logging
+# Ensure logs directory exists
+os.makedirs('logs', exist_ok=True)
+
+# Configure logging to console and file
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler('logs/app.log'),
+        logging.StreamHandler()
+    ]
 )
 
 def main():

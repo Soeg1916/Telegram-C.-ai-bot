@@ -51,8 +51,20 @@ def setup_bot(token: str) -> Application:
     # Register callback query handler for inline buttons
     application.add_handler(CallbackQueryHandler(button_callback))
     
-    # Register message handler for general messages
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    # Register message handler for general messages in private chats
+    application.add_handler(MessageHandler(
+        filters.TEXT & ~filters.COMMAND & filters.ChatType.PRIVATE, 
+        handle_message
+    ))
+    
+    # Register message handler for group chats - handle only when the bot is mentioned (@botname) or 
+    # when the message is a reply to the bot's message
+    application.add_handler(MessageHandler(
+        (filters.TEXT & ~filters.COMMAND & 
+        (filters.ChatType.GROUP | filters.ChatType.SUPERGROUP) &
+        (filters.REPLY | filters.Entity("mention"))),
+        handle_message
+    ))
     
     # Register error handler
     application.add_error_handler(handle_error)
@@ -94,6 +106,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "2. Start chatting with them!\n"
         "3. The character will respond based on their personality.\n"
         "4. Their mood might change based on your conversation.\n\n"
+        "*Group Chat Support:*\n"
+        "In group chats, interact with the bot by:\n"
+        "- Mentioning the bot using @botname\n"
+        "- Replying directly to the bot's messages\n\n"
         "*Custom Characters:*\n"
         "Create your own characters with /create\n"
         "You can set their name, background, and personality traits.\n\n"
@@ -194,6 +210,10 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             "2. Start chatting with them!\n"
             "3. The character will respond based on their personality.\n"
             "4. Their mood might change based on your conversation.\n\n"
+            "*Group Chat Support:*\n"
+            "In group chats, interact with the bot by:\n"
+            "- Mentioning the bot using @botname\n"
+            "- Replying directly to the bot's messages\n\n"
             "*Custom Characters:*\n"
             "Create your own characters with /create\n"
             "You can set their name, background, and personality traits.\n\n"
@@ -229,10 +249,55 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         # Show NSFW status
         nsfw_mode = character.get("nsfw", False)
         
+        nsfw_text = "Enabled (character will engage with ANY adult content)" if nsfw_mode else "Disabled (use /nsfw to enable)"
+        
         await query.edit_message_text(
             f"You are now chatting with *{character['name']}*!\n\n"
             f"{character['description']}\n\n"
-            f"NSFW mode: {'Enabled' if nsfw_mode else 'Disabled'}\n\n"
-            "Start chatting now! You can reset the conversation anytime with /reset",
+            f"NSFW mode: {nsfw_text}\n\n"
+            "Start chatting now! Character will match your message length and energy level.",
             parse_mode="Markdown"
+        )
+    elif query.data.startswith("delete_character:"):
+        character_id = query.data.split(":")[1]
+        character_manager = CharacterManager()
+        
+        # Get the character name for confirmation
+        all_characters = character_manager.get_all_characters()
+        character_name = all_characters.get(character_id, {}).get("name", "Unknown Character")
+        
+        # Ask for confirmation before deleting
+        keyboard = [
+            [InlineKeyboardButton("✅ Yes, delete this character", callback_data=f"confirm_delete:{character_id}")],
+            [InlineKeyboardButton("❌ No, keep this character", callback_data="cancel_delete")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(
+            f"Are you sure you want to delete the character '{character_name}'?\n\n"
+            "This action cannot be undone.",
+            reply_markup=reply_markup
+        )
+    elif query.data.startswith("confirm_delete:"):
+        character_id = query.data.split(":")[1]
+        character_manager = CharacterManager()
+        
+        # Get the character name for confirmation
+        all_characters = character_manager.get_all_characters()
+        character_name = all_characters.get(character_id, {}).get("name", "Unknown Character")
+        
+        # Delete the character
+        success = character_manager.delete_custom_character(update.effective_user.id, character_id)
+        
+        if success:
+            await query.edit_message_text(
+                f"✅ Successfully deleted the character '{character_name}'."
+            )
+        else:
+            await query.edit_message_text(
+                f"❌ Failed to delete '{character_name}'. You can only delete your own custom characters."
+            )
+    elif query.data == "cancel_delete":
+        await query.edit_message_text(
+            "Character deletion cancelled."
         )
