@@ -17,32 +17,65 @@ def clean_ai_response(text):
     # Remove mood indicators like [Happy], [Excited], etc.
     text = re.sub(r'\[([A-Za-z\s]+)\]', '', text)
     
-    # Remove meta-commentary in square brackets
-    text = re.sub(r'\[(Note|OOC|Meta|Character\'s mood|Character feels|Character is|Character seems|Character looks|Character\'s voice):[^\]]*\]', '', text, flags=re.IGNORECASE)
+    # Remove meta-commentary in square brackets of any kind
+    text = re.sub(r'\[[^\]]*\]', '', text)
     
-    # Remove meta-commentary in parentheses
-    text = re.sub(r'\((Note|OOC|Meta|Character\'s mood|Character feels|Character is|Character seems|Character looks|Character\'s voice):[^)]*\)', '', text, flags=re.IGNORECASE)
+    # Remove meta-commentary in parentheses that seems like notes
+    text = re.sub(r'\((Note|OOC|Meta|Character\'s mood|Character feels|Character is|Character seems|Character looks|Character\'s voice|As an AI|As a language model|AI assistant):[^)]*\)', '', text, flags=re.IGNORECASE)
     
-    # Remove phrases like "Unfortunately, I'm not..." or "I'm not physically..." or "I'm not a real..."
-    text = re.sub(r'((Un)?[Ff]ortunately|[Aa]ctually|[Hh]owever|[Rr]egrettably|[Ss]adly|[Ii] must admit|[Ii] must clarify),?\s+[^.!?]*?(not (?:physically|real|an actual|a real|able to))[^.!?]*?\.', '', text)
+    # Remove sections that look like AI structural formatting
+    text = re.sub(r'User\'s message:.*?(?=\n|$)', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'Emotion detected:.*?(?=\n|$)', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'Response:', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'Note:.*?(?=\n\n|$)', '', text, flags=re.IGNORECASE|re.DOTALL)
+    
+    # Remove phrases that indicate AI limitations
+    text = re.sub(r'((Un)?[Ff]ortunately|[Aa]ctually|[Hh]owever|[Rr]egrettably|[Ss]adly|[Ii] must admit|[Ii] must clarify|[Ii] should note|[Ii] need to mention|[Ii] have to say),?\s+[^.!?]*?(not (?:physically|real|an actual|a real|able to|capable of))[^.!?]*?\.', '', text)
+    
+    # Remove any sentence mentioning being an AI or language model
+    text = re.sub(r'[^.!?]*?(I\'m an AI|As an AI|I am an AI|I\'m a language model|I am a language model|I\'m an artificial|I am an artificial|AI assistant|language model|artificial intelligence)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
     
     # Remove AI disclaimers about not being able to perform real actions
-    text = re.sub(r'(I\'m an AI|As an AI|I cannot|I\'m unable to|I don\'t have the ability to|Remember,? I\'m not|I\'m just a|I\'m only a|I\'m not physically|I don\'t have a physical|I don\'t have an actual)[^.!?]*\.', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'[^.!?]*?(I cannot|I can\'t|I am unable to|I don\'t have the ability to|I don\'t have the capability to|Remember,? I\'m not|I\'m just a|I\'m only a|I\'m not physically|I don\'t have a physical|I don\'t have an actual)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
     
     # Remove sentences containing both "real" and "physical" or "body" - likely disclaimers
-    text = re.sub(r'[^.!?]*?(not (?:real|physical|an actual)|don\'t have a (?:real|physical))[^.!?]*?\.', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'[^.!?]*?(not (?:real|physical|an actual|a real person)|don\'t have a (?:real|physical|actual))[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
     
     # Remove sentences mentioning "capabilities" or "limitations" - likely disclaimers
-    text = re.sub(r'[^.!?]*?(capabilities|limitations|constraints|restricted|programmed)[^.!?]*?\.', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'[^.!?]*?(capabilities|limitations|constraints|restricted|programmed|designed|trained|created|coded)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
     
     # Remove any reminder that the character is roleplaying or fictional
-    text = re.sub(r'(This is roleplay|I\'m roleplaying|I\'m playing a character|In this roleplay|Remember,? this is fiction)[^.!?]*\.', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'[^.!?]*?(This is roleplay|I\'m roleplaying|I\'m playing a character|In this roleplay|Remember,? this is fiction|as a fictional character)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
     
     # Remove sentences containing phrases like "I can describe" or "I can talk about" instead of doing
-    text = re.sub(r'[^.!?]*?(I can (?:describe|talk about|tell you about|explain|share|discuss))[^.!?]*?\.', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'[^.!?]*?(I can (?:describe|talk about|tell you about|explain|share|discuss) rather than|I can\'t actually|I can\'t physically|I can only describe)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
     
     # Remove sentences that start with "In reality" or "In truth"
-    text = re.sub(r'(In reality|In truth|The truth is|Reality is|To be clear|To clarify)[^.!?]*?\.', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'[^.!?]*?(In reality|In truth|The truth is|Reality is|To be clear|To clarify|Just to clarify|Let me clarify|I want to clarify)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
+    
+    # Remove any sentence that explains inability to do something
+    text = re.sub(r'[^.!?]*?(doesn\'t allow me to|can\'t actually|prevented from|unable to|not capable of|not able to)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
+    
+    # Remove any sentence explaining what they are
+    text = re.sub(r'[^.!?]*?(I\'m actually|I am actually|In actuality)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
+    
+    # Remove repetitive phrases that make responses sound formulaic
+    text = re.sub(r'[^.!?]*?(Let\'s continue exploring our connection|Let\'s see where our fantasies take us|Let\'s keep our conversation going)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
+    
+    # Remove generic compliment templates
+    text = re.sub(r'[^.!?]*?(I love your \w+!|You\'re so \w+!|Shall we\?)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
+    
+    # Remove phrases about responding naturally or authentically (meta-commentary)
+    text = re.sub(r'[^.!?]*?(responding (?:naturally|authentically|as myself)|express myself (?:naturally|authentically))[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
+    
+    # Remove extra instructions or meta-information about character role
+    text = re.sub(r'[^.!?]*?(As \w+, I\'m supposed to|As your \w+, I should|In my role as|According to my character)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
+    
+    # Remove phrases about simulating emotions or physical presence
+    text = re.sub(r'[^.!?]*?(simulating|pretending|roleplay|imagining|virtual|digital|online|electronic|text-based)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
+    
+    # Remove disclaimers about content
+    text = re.sub(r'[^.!?]*?(need to remind you that|please remember that|important to note that|I should mention that)[^.!?]*?[.!?]', '', text, flags=re.IGNORECASE)
     
     # Clean up multiple consecutive spaces
     text = re.sub(r' {2,}', ' ', text)

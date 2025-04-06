@@ -125,7 +125,9 @@ class CharacterManager:
             "traits": traits,
             "system_prompt": system_prompt,
             "creator_id": user_id,
-            "nsfw": nsfw
+            "nsfw": nsfw,
+            "is_public": False,
+            "pending_approval": False
         }
         
         # Add the character to custom characters
@@ -281,3 +283,55 @@ class CharacterManager:
             return new_nsfw_status
             
         return False
+        
+    def request_public_character(self, user_id: int, character_id: str) -> bool:
+        """
+        Request to make a custom character public
+        Returns True if request was successful, False otherwise
+        """
+        # Check if the character exists and belongs to the user
+        if character_id in self.custom_characters and self.custom_characters[character_id]["creator_id"] == user_id:
+            # Mark the character as pending approval
+            self.custom_characters[character_id]["pending_approval"] = True
+            self._save_custom_characters()
+            return True
+        return False
+    
+    def approve_public_character(self, admin_id: int, character_id: str) -> bool:
+        """
+        Approve a character to be made public (admin only)
+        Returns True if approval was successful, False otherwise
+        """
+        # Check if the character exists and is pending approval
+        if character_id in self.custom_characters and self.custom_characters[character_id]["pending_approval"]:
+            # Mark the character as public and no longer pending
+            self.custom_characters[character_id]["is_public"] = True
+            self.custom_characters[character_id]["pending_approval"] = False
+            self.custom_characters[character_id]["approved_by"] = admin_id
+            self._save_custom_characters()
+            return True
+        return False
+    
+    def reject_public_character(self, admin_id: int, character_id: str) -> bool:
+        """
+        Reject a character's request to be made public (admin only)
+        Returns True if rejection was successful, False otherwise
+        """
+        # Check if the character exists and is pending approval
+        if character_id in self.custom_characters and self.custom_characters[character_id]["pending_approval"]:
+            # Mark the character as not pending approval
+            self.custom_characters[character_id]["pending_approval"] = False
+            self.custom_characters[character_id]["rejected_by"] = admin_id
+            self._save_custom_characters()
+            return True
+        return False
+    
+    def get_pending_characters(self) -> Dict[str, Dict]:
+        """Get all characters pending approval"""
+        return {char_id: char for char_id, char in self.custom_characters.items() 
+                if char.get("pending_approval", False)}
+    
+    def get_public_characters(self) -> Dict[str, Dict]:
+        """Get all public characters"""
+        return {char_id: char for char_id, char in self.custom_characters.items() 
+                if char.get("is_public", False)}

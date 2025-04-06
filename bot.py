@@ -13,6 +13,10 @@ from utils import (
     process_character_creation, delete_character, cancel_creation,
     toggle_nsfw, SELECTING_NAME, ENTERING_DESCRIPTION, SELECTING_TRAITS
 )
+from character_sharing import (
+    request_share_character, admin_list_pending_characters,
+    admin_approve_character, admin_reject_character, list_public_characters
+)
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +48,13 @@ def setup_bot(token: str) -> Application:
     application.add_handler(CommandHandler("stats", show_character_stats))
     application.add_handler(CommandHandler("delete", delete_character))
     application.add_handler(CommandHandler("nsfw", toggle_nsfw))
+    
+    # Add character sharing commands
+    application.add_handler(CommandHandler("share", request_share_character))
+    application.add_handler(CommandHandler("public", list_public_characters))
+    application.add_handler(CommandHandler("pending", admin_list_pending_characters))
+    application.add_handler(CommandHandler("approve", admin_approve_character))
+    application.add_handler(CommandHandler("reject", admin_reject_character))
     
     # Add conversation handler for character creation
     application.add_handler(creation_conv_handler)
@@ -77,6 +88,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     keyboard = [
         [InlineKeyboardButton("Choose a Character", callback_data="show_characters")],
         [InlineKeyboardButton("Create Custom Character", callback_data="create_character")],
+        [InlineKeyboardButton("Public Characters", callback_data="public_characters")],
         [InlineKeyboardButton("Help", callback_data="help")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -100,6 +112,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "/reset - Reset conversation with current character\n"
         "/stats - Show character's mood and personality stats\n"
         "/nsfw - Toggle NSFW mode for current character\n"
+        "/share - Request to share your custom character with the community\n"
+        "/public - Browse community-shared characters\n"
         "/help - Show this help message\n\n"
         "*How to use:*\n"
         "1. Select a character using /characters\n"
@@ -112,7 +126,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "- Replying directly to the bot's messages\n\n"
         "*Custom Characters:*\n"
         "Create your own characters with /create\n"
-        "You can set their name, background, and personality traits.\n\n"
+        "You can set their name, background, and personality traits.\n"
+        "Share your creations with the community using /share\n\n"
         "*NSFW Mode:*\n"
         "Use /nsfw to toggle NSFW mode for your current character.\n"
         "NSFW mode allows more mature and adult-themed conversations."
@@ -120,7 +135,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     
     keyboard = [
         [InlineKeyboardButton("Choose a Character", callback_data="show_characters")],
-        [InlineKeyboardButton("Create Custom Character", callback_data="create_character")]
+        [InlineKeyboardButton("Create Custom Character", callback_data="create_character")],
+        [InlineKeyboardButton("Public Characters", callback_data="public_characters")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
@@ -221,6 +237,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             "/reset - Reset conversation with current character\n"
             "/stats - Show character's mood and personality stats\n"
             "/nsfw - Toggle NSFW mode for current character\n"
+            "/share - Request to share your custom character with the community\n"
+            "/public - Browse community-shared characters\n"
             "/help - Show this help message\n\n"
             "*How to use:*\n"
             "1. Select a character using /characters\n"
@@ -233,7 +251,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             "- Replying directly to the bot's messages\n\n"
             "*Custom Characters:*\n"
             "Create your own characters with /create\n"
-            "You can set their name, background, and personality traits.\n\n"
+            "You can set their name, background, and personality traits.\n"
+            "Share your creations with the community using /share\n\n"
             "*NSFW Mode:*\n"
             "Use /nsfw to toggle NSFW mode for your current character.\n"
             "NSFW mode allows more mature and adult-themed conversations."
@@ -241,7 +260,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         
         keyboard = [
             [InlineKeyboardButton("Choose a Character", callback_data="show_characters")],
-            [InlineKeyboardButton("Create Custom Character", callback_data="create_character")]
+            [InlineKeyboardButton("Create Custom Character", callback_data="create_character")],
+            [InlineKeyboardButton("Public Characters", callback_data="public_characters")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -317,4 +337,40 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     elif query.data == "cancel_delete":
         await query.edit_message_text(
             "Character deletion cancelled."
+        )
+    elif query.data == "public_characters":
+        # Show public characters
+        character_manager = CharacterManager()
+        public_characters = character_manager.get_public_characters()
+        
+        if not public_characters:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="There are no public custom characters available yet. Be the first to share one with /share!"
+            )
+            return
+        
+        # Create the message text
+        message_text = "🌍 *Community Shared Characters* 🌍\n\n"
+        
+        # Create inline keyboard for character selection
+        keyboard = []
+        
+        for char_id, char in public_characters.items():
+            nsfw_mode = char.get("nsfw", False)
+            button_text = f"{char['name']} {'🔞' if nsfw_mode else ''}"
+            keyboard.append([InlineKeyboardButton(button_text, callback_data=f"select_character:{char_id}")])
+            
+            # Add details to message text
+            message_text += f"*{char['name']}*"
+            message_text += f" 🔞" if nsfw_mode else ""
+            message_text += f"\n{char['description'][:100]}...\n\n"
+        
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=message_text,
+            reply_markup=reply_markup,
+            parse_mode="Markdown"
         )
