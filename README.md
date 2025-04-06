@@ -32,7 +32,7 @@ A Telegram bot with AI-powered fictional character personalities using Mistral A
 - `/stats` - Show current character mood and personality stats
 - `/togglensfw` - Toggle NSFW mode for the current character
 - `/sharerequest` - Request to share your custom character with the community
-
+if you wanna try the bot - https://t.me/Character0_a1_bot
 ## Setup & Deployment
 
 ### Prerequisites
