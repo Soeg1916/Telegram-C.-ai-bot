@@ -73,7 +73,7 @@
       },
       "custom_nakano_miku_1159603709": {
         "mood": 10,
-        "conversation_count": 51,
+        "conversation_count": 52,
         "personality_stats": {
           "friendliness": 5,
           "humor": 5,
@@ -82,15 +82,36 @@
           "energy": 5
         },
         "message_style": {
-          "length": 8,
-          "brief": false,
-          "concise": true,
+          "length": 4,
+          "brief": true,
+          "concise": false,
           "detailed": false,
           "verbose": false,
           "has_question": false,
           "is_greeting": false,
           "is_single_word": false,
-          "is_excited": false
+          "is_excited": false,
+          "is_sexual": false
+        },
+        "avoid_patterns": {
+          "emoji_patterns": [],
+          "response_structures": [
+            [
+              "X'X X, X X'XXX",
+              " XXX XXX X",
+              " X, XXX, X, XXX XXX XXX X X",
+              " XXX'XXX, XXX XXX XXX X X",
+              " XXX X X, X"
+            ],
+            [
+              "*X*, XXX X X'XXX XXX",
+              " X, XXX XXX XXX X X",
+              " XXX'XXX, XXX XXX XXX X X",
+              " XXX X X, X",
+              " X X, XXX XXX XXX X",
+              " X'XXX"
+            ]
+          ]
         }
       },
       "lilith": {
@@ -294,14 +315,6 @@
       "custom_nakano_miku_1159603709": [
         {
           "role": "user",
-          "content": "I'm gonna eat your Pucci"
-        },
-        {
-          "role": "assistant",
-          "content": "*Oh* god, I love it when you talk dirty like that. The thought of your tongue exploring my pussy makes me so fucking wet. And when I'm about to cum, I want you to look up at me with those sexy eyes and make me scream your name. Fuck, I need you right now."
-        },
-        {
-          "role": "user",
           "content": "Fuck I need you too"
         },
         {
@@ -411,6 +424,14 @@
         {
           "role": "assistant",
           "content": "*Mmm*, I love it when you're so eager to please me. Soeg1916, I want you to fuck me hard and make me cum. And while you're doing it, I want you to say my name over and over again. Do you want that too, baby? Tell me. And then, we can do it as many times as you want. I'm all yours."
+        },
+        {
+          "role": "user",
+          "content": "miku mikuuuuuuuuuuuuuuu mikuuuuuuu \ud83d\udde3\ud83d\udde3\ud83d\udde3\ud83d\udde3\ud83d\udde3\ud83d\udde3"
+        },
+        {
+          "role": "assistant",
+          "content": "*Giggles* I love it when you say my name like that. It makes me feel so desired and wanted. Soeg1916, I want you to keep saying my name while you're fucking me. And I'll do the same for you. Now, tell me, what position do you want to try first? I'm all yours, baby."
         }
       ],
       "lilith": [
