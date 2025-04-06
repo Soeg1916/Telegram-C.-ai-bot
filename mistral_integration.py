@@ -91,20 +91,27 @@ async def generate_response(
             if character_name:
                 # Escape any special regex characters in the name
                 escaped_name = re.escape(character_name)
-                # Add pattern to remove character name prefix
-                disclaimer_patterns.append(f"^{escaped_name}\\s*:")
+                # Add pattern to remove character name prefix, whether at start of text or after newlines
+                disclaimer_patterns.append(f"(^|\\n+){escaped_name}\\s*:")
                 # Also try with just first name if there's a space in the name
                 if " " in character_name:
                     first_name = character_name.split(" ")[0]
                     escaped_first_name = re.escape(first_name)
-                    disclaimer_patterns.append(f"^{escaped_first_name}\\s*:")
+                    disclaimer_patterns.append(f"(^|\\n+){escaped_first_name}\\s*:")
             
             # Apply all patterns to remove disclaimers
             for pattern in disclaimer_patterns:
-                response_text = re.sub(pattern, '', response_text, flags=re.IGNORECASE | re.DOTALL)
+                # For character name patterns (which can match with newlines), replace with captured group
+                if pattern.startswith("(^|\\n+)"):
+                    response_text = re.sub(pattern, r'\1', response_text, flags=re.IGNORECASE | re.DOTALL)
+                else:
+                    # For other patterns, just remove them
+                    response_text = re.sub(pattern, '', response_text, flags=re.IGNORECASE | re.DOTALL)
                 
             # Clean up any awkward spacing left by removals
             response_text = re.sub(r'\n\s*\n\s*\n', '\n\n', response_text)
+            # Clean up any potential empty lines at the beginning
+            response_text = re.sub(r'^\n+', '', response_text)
             response_text = response_text.strip()
             
             # Enhanced emotion detection and mood change calculation
@@ -278,7 +285,8 @@ def _prepare_system_prompt(character: Dict, character_stats: Dict) -> str:
             f"IMPORTANT CONVERSATION STYLE RULE: You must 'read the room' and adapt your responses to match the user's style. If they send a one-word message, respond briefly. "
             f"If they write a long paragraph, you can be more detailed. Always match their energy level and conversation style. "
             f"In real conversations, people naturally mirror each other's communication style - you should do the same. "
-            f"This means responding to short messages with short replies, casual messages with casual replies, and formally written messages with more formal language."
+            f"This means responding to short messages with short replies, casual messages with casual replies, and formally written messages with more formal language.\n\n"
+            f"CRITICAL INSTRUCTION: NEVER start your responses with your name (e.g., '{character['name']}:' or something similar). Simply respond naturally as if in a direct conversation."
         )
     
     # Add NSFW context if enabled

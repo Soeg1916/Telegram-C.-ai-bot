@@ -103,6 +103,17 @@
           "is_single_word": false,
           "is_excited": false
         }
+      },
+      "hannibal": {
+        "mood": 5,
+        "conversation_count": 0,
+        "personality_stats": {
+          "friendliness": 5,
+          "humor": 5,
+          "intelligence": 5,
+          "empathy": 5,
+          "energy": 5
+        }
       }
     },
     "conversation_history": {
@@ -581,8 +592,8 @@
     "selected_character": "naruto",
     "character_stats": {
       "naruto": {
-        "mood": 9.895128651274373,
-        "conversation_count": 7,
+        "mood": 10,
+        "conversation_count": 9,
         "personality_stats": {
           "friendliness": 5,
           "humor": 5,
@@ -591,9 +602,9 @@
           "energy": 5
         },
         "message_style": {
-          "length": 7,
-          "brief": false,
-          "concise": true,
+          "length": 4,
+          "brief": true,
+          "concise": false,
           "detailed": false,
           "verbose": false,
           "has_question": false,
@@ -660,6 +671,22 @@
         {
           "role": "assistant",
           "content": "Naruto: *laughs* Hey, now! Don't say that! Remember, during the written exam, I might not have known all the answers, but I never gave up! I filled in the answers I knew and did my best on the rest. That's what's important! So, when you take your test, just do your best and never give up! You've got this! Believe it!"
+        },
+        {
+          "role": "user",
+          "content": "Ok i will never gibeup and just believe in it"
+        },
+        {
+          "role": "assistant",
+          "content": "Naruto: That's the spirit! I'm proud of you already! Keep that determination and belief in yourself, and you'll be unstoppable! Remember, even when things get tough, you can always rely on your friends and family for support. Just like I have my friends and my sensei, Kakashi, to help me out. You've got a whole team behind you, cheering you on! Believe it!"
+        },
+        {
+          "role": "user",
+          "content": "ok thank you \ud83d\ude04"
+        },
+        {
+          "role": "assistant",
+          "content": "Naruto: No problem! It's always great to help a friend in need! Remember, if you ever need any advice or just someone to talk to, I'm here for you! And of course, I'm always up for a ramen break too! Just say the word, and we'll chat about our favorite noodle dishes! Believe it! *smiles*"
         }
       ]
     }
